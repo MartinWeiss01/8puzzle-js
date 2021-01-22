@@ -1,0 +1,26 @@
+/* app.cs | © Copyright 2021 Martin Weiss (martinWeiss.cz) | AGP | v1.06f */
+a{box-sizing: border-box;text-decoration:none}
+*{color:white;font-family:'Open Sans',sans-serif}
+@font-face{font-family:'Open Sans';src:url(OpenSansBold.woff2) format("woff2");font-weight:700;font-style:normal}@font-face{font-family:'Open Sans';src:url(OpenSansSemiBold.woff2) format("woff2");font-weight:600;font-style:normal}@font-face{font-family:'Open Sans';src:url(OpenSansRegular.woff2) format("woff2");font-weight:400;font-style:normal}
+/* material.ic.css © Copyright 2020 Martin Weiss (martinweiss.cz) */
+@font-face{font-family:'Material Icons';src:url(MaterialIcons.woff2) format("woff2");font-weight:400;font-style:normal;font-weight:normal}icon{font-family:'Material Icons';display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;word-wrap:normal;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;-moz-osx-font-smoothing:grayscale;font-feature-settings:liga;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+
+#root {display: grid;min-height: 100vh;grid-template-columns: auto auto;grid-template-rows: 6rem 8rem auto auto;grid-template-areas:"nav nav" "config steps" "main steps" "main steps"}
+@media only screen and (max-width: 768px) {#root {grid-template-areas:"nav nav" "config config" "main main" "steps steps"}}
+body {margin:0;padding:0;background:#2e2e2e}
+input {background:none;outline:none;border:1px solid black;padding:13px 20px;border-radius:7px}
+
+#puzzle-container {display:flex;flex-wrap:wrap;gap:10px}
+.puzzle-item {transition:.3s;content:' ';display:flex;justify-content:center;align-items:center;border:1px solid #3c3a3a;border-radius:5px;flex:1 1 30%;height:100px;width:40px;box-shadow:inset 9px 9px 18px #2a2a2a, inset -9px -9px 18px #323232}
+.empty {transition:.3s;border-color:cyan}
+.puzzle-item:not(.empty):hover {transition:.3s;border-color:coral}
+/*
+*/
+.fp {fill:#4EA8DE}
+.bp {fill:#FFFFFF}
+.logo {height: 80%;max-width: 100%;}
+
+nav {grid-area: nav;display: flex;justify-content: center;align-items: center;box-shadow:  12px 12px 24px #2b2b2b, -12px -12px 24px #313131}
+#config {grid-area: config;display: flex;justify-content: center;align-items: center}
+main {grid-area: main;display: flex;justify-content: center;align-items: center}
+#steps {grid-area: steps;display: flex;justify-content: center;align-items: center;border-left:1px solid gray}
