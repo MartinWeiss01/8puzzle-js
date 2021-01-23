@@ -24,15 +24,15 @@
             </div>
             <main>
                 <div id="puzzle-container">
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
-                    <div class="puzzle-item"></div>
+                    <div id="t1" class="puzzle-item"></div>
+                    <div id="t2" class="puzzle-item"></div>
+                    <div id="t3" class="puzzle-item"></div>
+                    <div id="t4" class="puzzle-item"></div>
+                    <div id="t5" class="puzzle-item"></div>
+                    <div id="t6" class="puzzle-item"></div>
+                    <div id="t7" class="puzzle-item"></div>
+                    <div id="t8" class="puzzle-item"></div>
+                    <div id="t9" class="puzzle-item"></div>
                 </div>                
             </main>
             <div id="steps">step</div>
@@ -67,18 +67,214 @@
         })
 
     /* ----------------------------------------------------------- */
+    function compareArrays(arr1, arr2) {
+        if(JSON.stringify(arr1) !== JSON.strinigfy(arr2)) return 0;
+        /*for(let i = 0; i < arr1.length; i++) {
+            for(let j = 0; j < arr1[i].length; j++) {
+                if(arr1[i][j] !== arr2[i][j]) return 0;
+            }
+        }*/
+        return 1;
+    }
+
+    document.addEventListener("keydown", e => {
+        if(set) {
+            switch (e.keyCode) {
+                case 37:
+                    startNode = move(startNode, "LEFT");
+                    console.table(startNode);
+                    break;
+                case 38:
+                    startNode = move(startNode, "UP");
+                    console.table(startNode);
+                    break;
+                case 39:
+                    startNode = move(startNode, "RIGHT");
+                    console.table(startNode);
+                    break;
+                case 40:
+                    startNode = move(startNode, "DOWN");
+                    console.table(startNode);
+                    break;
+                default:
+                    return;
+                    break;
+            }
+            if(compareArrays(startNode, expectedNode)) {
+                set = false;
+                console.log("YOU WON!");
+            }
+        }
+    });
+
+    let set = false, startNode, expectedNode;
+    /* ----------------------------------------------------------- */
 
     function calculatePuzzle(initialState = "134025678", finalState = "123456780") {
         if(!(initialState.includes(0)) || !(finalState.includes(0))) return console.warn(`[!] initialState & finalState requires 0`);
         if((initialState.length !== 9) || (finalState.length !== 9)) return console.warn(`[!] initialState & finalState have to have length 9 nums`);
-        let startNode = parseIntoMatrix(initialState.split("").map(i => parseInt(i)), 3),
-        expectedNode = parseIntoMatrix(finalState.split("").map(i => parseInt(i)), 3);
-
-        console.log(startNode);
-        console.log(expectedNode);
+        startNode = fetchMatrix(initialState.split("").map(i => parseInt(i)), 3),
+        expectedNode = fetchMatrix(finalState.split("").map(i => parseInt(i)), 3);
+        set = true;
     }
     
-    function parseIntoMatrix(array, columns = 3) {
+    function move(array, direction) {
+        let x, y, nullpos = getNullPosition(array);
+        x = nullpos[0],
+        y = nullpos[1];
+        
+        if(direction === "UP") {
+            if(array[y-1] === undefined) {
+                console.info("Nahoru to nepůjde");
+                return array;
+            }
+            array[y][x] = array[y-1][x];
+            array[y-1][x] = 0;
+        } else if(direction === "DOWN") {
+            if(array[y+1] === undefined) {
+                console.info("Dolů to nepůjde");
+                return array;
+            }
+            array[y][x] = array[y+1][x];
+            array[y+1][x] = 0;
+        } else if(direction === "RIGHT") {
+            if(array[y][x+1] === undefined) {
+                console.info("Doprava to nepůjde");
+                return array;
+            }
+            array[y][x] = array[y][x+1];
+            array[y][x+1] = 0;
+        } else if(direction === "LEFT") {
+            if(array[y][x-1] === undefined) {
+                console.info("Doleva to nepůjde");
+                return array;
+            }
+            array[y][x] = array[y][x-1];
+            array[y][x-1] = 0;
+        }
+        return array;
+    }
+
+    function getNullPosition(array) {
+        let x, y;
+        for(let i = 0; i < array.length; i++) {
+            for(let j = 0; j < array[i].length; j++) {
+                if(array[i][j] === 0) {
+                    x = j;
+                    y = i;
+                    break;
+                }
+            }
+        }
+        return [x, y];
+    }
+    
+    /* =================================================== */
+    let closedpaths = [];
+
+    class Node {
+        constructor(currentnode, parentnode, g, h, direction) {
+            this.currentnode = currentnode;
+            this.parentnode = parentnode;
+            this.g = g;
+            this.h = h;
+            this.f = g+h;
+            this.direction = direction;
+        }
+    }
+
+    function calcMisplaced(node, goal) {
+        let h = 0;
+        for(let i = 0; i < node.length; i++) {
+            for(let j = 0; j < node[i].length; j++) {
+                if(node[i][j] !== goal[i][j]) h++;
+            }
+        }
+        return h;
+    }
+
+    const dirs = {"UP": [-1, 0], "DOWN": [1, 0], "RIGHT": [0, 1], "LEFT": [0, -1]};
+    function findDirectionWithLowestH(node, goal) {
+        let indexOfLowest, subnodes = [], subnodesHs = [];
+
+        for(let i = 0; i < Object.keys(dirs).length; i++) {
+            let temp = getMovedNode(node, Object.keys(dirs)[i]);
+            if(!(JSON.stringify(closedpaths).includes(JSON.stringify(temp)))) subnodes.push(temp);
+        }
+
+        const subnodesHs = subnodes.map(ln => calcMisplaced(ln, goal));
+        //for(let i = 0; i < subnodes.length; i++) subnodesHs.push(calcMisplaced(subnodes[i], goal));
+        indexOfLowest = subnodesHs.indexOf(Math.min.apply(Math, subnodesHs));
+        return {};
+    }
+
+    function getMovedNode(node, direction) {
+        let x, y, nullpos = getNullPosition(node);
+        x = nullpos[0],
+        y = nullpos[1];
+        
+        switch(direction) {
+            case "UP":
+                if(node[y-1] === undefined) return 0;
+                node[y][x] = node[y-1][x];
+                node[y-1][x] = 0;
+                break;
+            case "DOWN":
+                if(node[y+1] === undefined) return 0;
+                node[y][x] = node[y+1][x];
+                node[y+1][x] = 0;
+                break;
+            case "RIGHT":
+                if(node[y][x+1] === undefined) return 0;
+                node[y][x] = node[y][x+1];
+                node[y][x+1] = 0;
+                break;
+            case "LEFT":
+                if(node[y][x-1] === undefined) return 0;
+                node[y][x] = node[y][x-1];
+                node[y][x-1] = 0;
+                break;
+            default:
+                return 0;
+                break;
+        }
+
+        return node;
+    }
+/*  ------------------------------
+    Maybe faster replacement ???
+    ------------------------------
+    const dirs = {"UP": [-1, 0], "DOWN": [1, 0], "RIGHT": [0, 1], "LEFT": [0, -1]};
+    function getMovedNode(node, direction) {
+        let x, y, nullpos = getNullPosition(node);
+        x = nullpos[0], y = nullpos[1];
+
+        switch(direction) {
+            case "UP":
+                if(node[y-1] === undefined) return 0;
+                break;
+            case "DOWN":
+                if(node[y+1] === undefined) return 0;
+                break;
+            case "RIGHT":
+                if(node[y][x+1] === undefined) return 0;
+                break;
+            case "LEFT":
+                if(node[y][x-1] === undefined) return 0;
+                break;
+            default:
+                return 0;
+                break;
+        }
+        node[y][x] = node[y+(dirs[direction][0])][x+(dirs[direction][1])];
+        node[y+(dirs[direction][0])][x+(dirs[direction][1])] = 0;
+        return node;
+    }
+*/
+
+    /* =================================================== */
+    /* Parse input into the Matrix*/
+    function fetchMatrix(array, columns = 3) {
         let nextrow = false, comrow = [], final = [];
 
         for(let i = 0; i < array.length; i++) {
