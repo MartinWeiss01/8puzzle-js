@@ -76,30 +76,6 @@
         }
     }
 
-    const keywords = ["LEFT", "UP", "RIGHT", "DOWN"];
-    document.addEventListener("keydown", e => {
-        if(!set) return;
-        if(keywords[e.keyCode - 37] === undefined) return;
-        startNode = move(startNode, keywords[e.keyCode - 37]);
-        //console.table(startNode);
-        printTableArray(startNode);
-        if(compareArrays(startNode, expectedNode)) {
-            set = false;
-            console.log("YOU WON!");
-        }
-    });
-
-    let set = false, startNode, expectedNode;
-    /* ----------------------------------------------------------- */
-
-    function calculatePuzzle(initialState = "134025678", finalState = "123456780") {
-        if(!(initialState.includes(0)) || !(finalState.includes(0))) return console.warn(`[!] initialState & finalState requires 0`);
-        if((initialState.length !== 9) || (finalState.length !== 9)) return console.warn(`[!] initialState & finalState have to have length 9 nums`);
-        startNode = fetchMatrix(initialState.split("").map(i => parseInt(i)), 3),
-        expectedNode = fetchMatrix(finalState.split("").map(i => parseInt(i)), 3);
-        set = true;
-    }
-    
     function move(array, direction) {
         let x, y, nullpos = findPositionOfNull(array);
         x = nullpos[0], y = nullpos[1];
@@ -119,28 +95,38 @@
         array[y+(dirs[direction][0])][x+(dirs[direction][1])] = 0;
         return array;
     }
-
-    function findPositionOfNull(array, nullchar = 0) {
-        let x, y;
-        for(let i = 0; i < array.length; i++) {
-            for(let j = 0; j < array[i].length; j++) {
-                if(array[i][j] === nullchar) {
-                    x = j;
-                    y = i;
-                    break;
-                }
-            }
+    /* ----------------------------------------------------------- */
+    document.addEventListener("keydown", e => {
+        if(!isGameReady) return;
+        if(Object.keys(keywords[e.keyCode - 37]) === undefined) return;
+        startNode = move(startNode, Object.keys(keywords[e.keyCode - 37]));
+        printTableArray(startNode);
+        if(compareNodes(startNode, expectedNode)) {
+            isGameReady = false;
+            alert("You won!");
         }
-        return [x, y];
-    }
+    });
 
+    let isGameReady = false, startNode, expectedNode;
+
+    function calculatePuzzle(initialState = "134025678", finalState = "123456780") {
+        if(!(initialState.includes(0)) || !(finalState.includes(0))) return console.warn(`[!] initialState & finalState requires 0`);
+        if((initialState.length !== 9) || (finalState.length !== 9)) return console.warn(`[!] initialState & finalState have to have length 9 nums`);
+        startNode = fetchMatrix(initialState.split("").map(i => parseInt(i)), 3),
+        expectedNode = fetchMatrix(finalState.split("").map(i => parseInt(i)), 3);
+        isGameReady = true;
+    }
+    
     /* =================================================== */
+    const dirs = {"UP": [-1, 0], "DOWN": [1, 0], "RIGHT": [0, 1], "LEFT": [0, -1]};
     let closedpaths = [];
 
     class Node {
         constructor(currentnode, parentnode, g, h, direction) {
             this.currentnode = currentnode;
             this.parentnode = parentnode;
+            this.currentstring = JSON.stringify(currentnode);
+            this.parentstring = JSON.stringify(parentnode);
             this.g = g;
             this.h = h;
             this.f = g+h;
@@ -148,7 +134,7 @@
         }
     }
 
-    const dirs = {"UP": [-1, 0], "DOWN": [1, 0], "RIGHT": [0, 1], "LEFT": [0, -1]};
+    
     function findDirectionWithLowestH(node, goal) {
         let indexOfLowest, subnodes = [];
 
@@ -200,6 +186,21 @@
             }
         }
         return h;
+    }
+
+    /* Find position of null character (probably 0 or _) */
+    function findPositionOfNull(array, nullchar = 0) {
+        let x, y;
+        for(let i = 0; i < array.length; i++) {
+            for(let j = 0; j < array[i].length; j++) {
+                if(array[i][j] === nullchar) {
+                    x = j;
+                    y = i;
+                    break;
+                }
+            }
+        }
+        return [x, y];
     }
 
     /* Parse input into the Matrix */
