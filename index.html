@@ -75,52 +75,36 @@
             console.log(row);
         }
     }
-
-    function move(array, direction) {
-        let x, y, nullpos = findPositionOfNull(array);
-        x = nullpos[0], y = nullpos[1];
-
-        switch(direction) {
-            case "UP":
-            case "DOWN":
-                if(array[y+(dirs[direction][0])] === undefined) return array;
-                break;
-            case "RIGHT":
-            case "LEFT":
-                if(array[y+(dirs[direction][0])][x+(dirs[direction][1])] === undefined) return array;
-                break;
-        }
-        
-        array[y][x] = array[y+(dirs[direction][0])][x+(dirs[direction][1])];
-        array[y+(dirs[direction][0])][x+(dirs[direction][1])] = 0;
-        return array;
-    }
     /* ----------------------------------------------------------- */
     document.addEventListener("keydown", e => {
         if(!isGameReady) return;
-        if(Object.keys(keywords[e.keyCode - 37]) === undefined) return;
-        startNode = move(startNode, Object.keys(keywords[e.keyCode - 37]));
-        printTableArray(startNode);
-        if(compareNodes(startNode, expectedNode)) {
+        if(Object.keys(dirs)[e.keyCode - 37] === undefined) return;
+        parentNode = moveNode(parentNode, Object.keys(dirs)[e.keyCode - 37]);
+        printTableArray(parentNode);
+        if(compareNodes(parentNode, expectedNode)) {
             isGameReady = false;
             alert("You won!");
         }
     });
 
-    let isGameReady = false, startNode, expectedNode;
+    let isGameReady = false, startNode, expectedNode, parentNode, closedpaths = [], historypath = [], historymoves = [null];
 
     function calculatePuzzle(initialState = "134025678", finalState = "123456780") {
+        closedpaths = [], historypath = [], historymoves = [null];
         if(!(initialState.includes(0)) || !(finalState.includes(0))) return console.warn(`[!] initialState & finalState requires 0`);
         if((initialState.length !== 9) || (finalState.length !== 9)) return console.warn(`[!] initialState & finalState have to have length 9 nums`);
         startNode = fetchMatrix(initialState.split("").map(i => parseInt(i)), 3),
         expectedNode = fetchMatrix(finalState.split("").map(i => parseInt(i)), 3);
+        parentNode = JSON.parse(JSON.stringify(startNode));
+        historypath.push(startNode);
         isGameReady = true;
+        findDirectionWithLowestH(startNode, expectedNode, 0);
     }
     
     /* =================================================== */
     const dirs = {"UP": [-1, 0], "DOWN": [1, 0], "RIGHT": [0, 1], "LEFT": [0, -1]};
-    let closedpaths = [];
 
+    /*
     class Node {
         constructor(currentnode, parentnode, g, h, direction) {
             this.currentnode = currentnode;
@@ -132,28 +116,39 @@
             this.f = g+h;
             this.direction = direction;
         }
-    }
+    }*/
 
-    function findDirectionWithLowestH(node, goal) {
-        let indexOfLowest, subnodes = [];
+    function findDirectionWithLowestH(node, goal, steps) {
+        if(compareNodes(node, goal)) {
+            /*for(let i = 0; i < historypath.length; i++) {
+                if(i !== 0) console.log(historymoves[i]);
+                printTableArray(historypath[i]);
+            }
+            console.log(`-------------\nKonec\nPočet kroků: ${historymoves.length-1}`);*/
+            return 1;
+        }
+
+        let indexOfLowest, subnodes = [], submoves = [];
 
         for(let i = 0; i < Object.keys(dirs).length; i++) {
-            let temp = moveNode(node, Object.keys(dirs)[i], goal);
+            let temp = moveNode(node, Object.keys(dirs)[i]);
             if(temp !== 0) {
-                console.log(JSON.stringify(temp));
                 if(!(JSON.stringify(closedpaths).includes(JSON.stringify(temp)))) {
                     subnodes.push(temp);
-                    closedpaths.push(temp);
+                    submoves.push(Object.keys(dirs)[i]);
+                    //closedpaths.push(temp);
                 }
             }
         }
 
         const subnodesHs = subnodes.map(ln => calcMisplaced(ln, goal));
         indexOfLowest = subnodesHs.indexOf(Math.min.apply(Math, subnodesHs));
-        return {"steps": subnodesHs[indexOfLowest], "node": subnodes[indexOfLowest]};
+        //historypath.push(subnodes[indexOfLowest]);
+        //historymoves.push(submoves[indexOfLowest]);
+        return findDirectionWithLowestH(subnodes[indexOfLowest], goal, subnodesHs[indexOfLowest]);
     }
 
-    function moveNode(node_original, direction, goal) {
+    function moveNode(node_original, direction) {
         let x, y, node = JSON.parse(JSON.stringify(node_original)), nullpos = findPositionOfNull(node);
         x = nullpos[0], y = nullpos[1];
 
