@@ -101,7 +101,7 @@
     }
     
     function move(array, direction) {
-        let x, y, nullpos = getNullPosition(array);
+        let x, y, nullpos = findPositionOfNull(array);
         x = nullpos[0], y = nullpos[1];
 
         switch(direction) {
@@ -120,7 +120,7 @@
         return array;
     }
 
-    function getNullPosition(array, nullchar = 0) {
+    function findPositionOfNull(array, nullchar = 0) {
         let x, y;
         for(let i = 0; i < array.length; i++) {
             for(let j = 0; j < array[i].length; j++) {
@@ -164,7 +164,7 @@
     }
 
     function getMovedNode(node, direction) {
-        let x, y, nullpos = getNullPosition(node);
+        let x, y, nullpos = findPositionOfNull(node);
         x = nullpos[0], y = nullpos[1];
 
         switch(direction) {
