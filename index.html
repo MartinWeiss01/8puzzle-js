@@ -107,11 +107,11 @@
         switch(direction) {
             case "UP":
             case "DOWN":
-                if(array[y+(dirs[direction][0])] === undefined) {console.info("Tudy ti pšenka nepokvete"); return array;}
+                if(array[y+(dirs[direction][0])] === undefined) return array;
                 break;
             case "RIGHT":
             case "LEFT":
-                if(array[y+(dirs[direction][0])][x+(dirs[direction][1])] === undefined) {console.info("Tudy ti pšenka nepokvete"); return array;}
+                if(array[y+(dirs[direction][0])][x+(dirs[direction][1])] === undefined) return array;
                 break;
         }
         
@@ -120,11 +120,11 @@
         return array;
     }
 
-    function getNullPosition(array) {
+    function getNullPosition(array, nullchar = 0) {
         let x, y;
         for(let i = 0; i < array.length; i++) {
             for(let j = 0; j < array[i].length; j++) {
-                if(array[i][j] === 0) {
+                if(array[i][j] === nullchar) {
                     x = j;
                     y = i;
                     break;
