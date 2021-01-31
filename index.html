@@ -118,33 +118,33 @@
         }
     }*/
 
+    const wait = ms => new Promise((solution) => setTimeout(solution, ms));
     function findDirectionWithLowestH(node, goal, steps) {
         if(compareNodes(node, goal)) {
-            /*for(let i = 0; i < historypath.length; i++) {
+            for(let i = 0; i < historypath.length; i++) {
                 if(i !== 0) console.log(historymoves[i]);
                 printTableArray(historypath[i]);
             }
-            console.log(`-------------\nKonec\nPočet kroků: ${historymoves.length-1}`);*/
+            console.log(`-------------\nKonec\nPočet kroků: ${historymoves.length-1}`);
             return 1;
         }
 
         let indexOfLowest, subnodes = [], submoves = [];
-
         for(let i = 0; i < Object.keys(dirs).length; i++) {
             let temp = moveNode(node, Object.keys(dirs)[i]);
             if(temp !== 0) {
                 if(!(JSON.stringify(closedpaths).includes(JSON.stringify(temp)))) {
                     subnodes.push(temp);
                     submoves.push(Object.keys(dirs)[i]);
-                    //closedpaths.push(temp);
+                    closedpaths.push(temp);
                 }
             }
         }
 
         const subnodesHs = subnodes.map(ln => calcMisplaced(ln, goal));
         indexOfLowest = subnodesHs.indexOf(Math.min.apply(Math, subnodesHs));
-        //historypath.push(subnodes[indexOfLowest]);
-        //historymoves.push(submoves[indexOfLowest]);
+        historypath.push(subnodes[indexOfLowest]);
+        historymoves.push(submoves[indexOfLowest]);
         return findDirectionWithLowestH(subnodes[indexOfLowest], goal, subnodesHs[indexOfLowest]);
     }
 
