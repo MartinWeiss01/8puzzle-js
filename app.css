@@ -1,26 +1,88 @@
-/* app.cs | © Copyright 2021 Martin Weiss (martinWeiss.cz) | AGP | v1.06f */
-a{box-sizing: border-box;text-decoration:none}
-*{color:white;font-family:'Open Sans',sans-serif}
-@font-face{font-family:'Open Sans';src:url(OpenSansBold.woff2) format("woff2");font-weight:700;font-style:normal}@font-face{font-family:'Open Sans';src:url(OpenSansSemiBold.woff2) format("woff2");font-weight:600;font-style:normal}@font-face{font-family:'Open Sans';src:url(OpenSansRegular.woff2) format("woff2");font-weight:400;font-style:normal}
-/* material.ic.css © Copyright 2020 Martin Weiss (martinweiss.cz) */
-@font-face{font-family:'Material Icons';src:url(MaterialIcons.woff2) format("woff2");font-weight:400;font-style:normal;font-weight:normal}icon{font-family:'Material Icons';display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;word-wrap:normal;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;-moz-osx-font-smoothing:grayscale;font-feature-settings:liga;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+a{text-decoration:none}
+[data-role="button"]{cursor:pointer}
+.flex{display:flex;flex-direction:column}
+.flex.row{flex-direction:row!important}
+.flex.hcenter{align-items:center}
+.flex.hstart{align-items:flex-start}
+.flex.vcenter{justify-content:center}
+.flex.justify-content-between{justify-content:space-between}
+.flex.justify-content-around{justify-content:space-around}
+.flex.justify-content-evenly{justify-content:space-evenly}
+.flex.justify-content-end{justify-content:flex-end}
+.flex.wrap{flex-wrap:wrap}
+.flex.grow{flex-grow:1}
+*{font-family:'Open Sans',sans-serif;box-sizing:border-box}
 
-#root {display: grid;min-height: 100vh;grid-template-columns: auto auto;grid-template-rows: 6rem 8rem auto auto;grid-template-areas:"nav nav" "config steps" "main steps" "main steps"}
-@media only screen and (max-width: 768px) {#root {grid-template-areas:"nav nav" "config config" "main main" "steps steps"}}
-body {margin:0;padding:0;background:#2e2e2e}
-input {background:none;outline:none;border:1px solid black;padding:13px 20px;border-radius:7px}
+* {
+    margin: 0;
+    padding: 0
+}
 
-#puzzle-container {display:flex;flex-wrap:wrap;gap:10px}
-.puzzle-item {transition:.3s;content:' ';display:flex;justify-content:center;align-items:center;border:1px solid #3c3a3a;border-radius:5px;flex:1 1 30%;height:100px;width:40px;box-shadow:inset 9px 9px 18px #2a2a2a, inset -9px -9px 18px #323232}
-.empty {transition:.3s;border-color:cyan}
-.puzzle-item:not(.empty):hover {transition:.3s;border-color:coral}
-/*
-*/
-.fp {fill:#4EA8DE}
-.bp {fill:#FFFFFF}
-.logo {height: 80%;max-width: 100%;}
+html {
+    width:100%;
+    height:100%;
+}
 
-nav {grid-area: nav;display: flex;justify-content: center;align-items: center;box-shadow:  12px 12px 24px #2b2b2b, -12px -12px 24px #313131}
-#config {grid-area: config;display: flex;justify-content: center;align-items: center}
-main {grid-area: main;display: flex;justify-content: center;align-items: center}
-#steps {grid-area: steps;display: flex;justify-content: center;align-items: center;border-left:1px solid gray}
+.root {margin-top:6rem;gap:1rem}
+
+.puzzle, .puzzle-row {gap:5px}
+.puzzle-item {
+    background: #eaeaea;
+    height: 70px;
+    width: 70px;
+    border-radius: 6px;
+    font-size:17px
+}
+
+.logo {
+    height: 120px;
+    min-height: fit-content;
+}
+
+.controllers {
+    gap: 5px;
+}
+
+.solution-detail {
+    gap:1rem;
+    font-size: 13px;
+}
+
+.zeropos {
+    border: 2px solid #1db688;
+    font-weight: bold;
+}
+
+.config {
+    gap: 1rem;
+}
+
+.profile-controller {
+    border: 1px solid #5a5a5a33;
+    padding: 0.6rem 1.65rem;
+    border-radius: 7px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    background: none;
+    outline: none;
+    transition: .15s;
+}
+.profile-controller:hover {
+    transition: .15s;
+}
+
+input:not([type]):focus,
+input[type="number"]:focus {
+    color:rgb(29, 182, 136);border-color:rgb(29, 182, 136)
+}
+
+label {color:#757575;font-size:13px}
+.profile-controller.calc {color:rgb(29, 182, 136);border-color:rgb(29, 182, 136)}
+.profile-controller.calc:hover:not(:disabled) {color:white;border-color:rgb(29, 182, 136);background:rgb(29, 182, 136)}
+
+button:disabled {
+    color: #757575!important;
+    cursor: not-allowed;
+    border-color: #5a5a5a33!important
+}
